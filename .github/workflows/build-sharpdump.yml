@@ -3,17 +3,22 @@ name: Build SharpDump
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout SharpDump
+    - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Build SharpDump with dotnet CLI
+    - name: Enable .NET Framework 3.5 (required for targeting .NET 3.5)
+      run: |
+        dism.exe /online /enable-feature /featurename:NetFx3 /all /quiet /norestart
+      shell: cmd
+
+    - name: Build SharpDump
       run: dotnet build ./SharpDump/SharpDump.csproj -c Release -r win-x64 --no-self-contained
       shell: cmd
 
@@ -21,4 +26,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: SharpDump.exe
-        path: SharpDump\bin\Release\net7.0\win-x64\SharpDump.exe
+        path: SharpDump\bin\Release\net35\win-x64\SharpDump.exe
