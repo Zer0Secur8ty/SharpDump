@@ -3,7 +3,7 @@ name: Build SharpDump
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,11 +13,9 @@ jobs:
     - name: Checkout SharpDump
       uses: actions/checkout@v3
 
-    - name: Install .NET Framework Developer Pack 3.5
-      run: |
-        Invoke-WebRequest https://download.microsoft.com/download/B/0/D/B0D6DF26-CE4F-4E08-8BFD-4D62B646C8D9/NDP35SP1-KB958484-x86-x64-AllOS-ENU.exe -OutFile install.exe
-        .\install.exe /quiet /norestart
-      shell: powershell
+    - name: Enable .NET Framework 3.5
+      run: dism /online /enable-feature /featurename:NetFx3 /All /NoRestart
+      shell: cmd
 
     - name: Build SharpDump with MSBuild
       run: msbuild SharpDump.csproj /p:Configuration=Release /p:Platform="Any CPU"
